@@ -1,6 +1,5 @@
 name: 🚀 Deploy HF Space
 
-# Se dispara en cada push a main; ajústalo si tu rama es otra
 on:
   push:
     branches: [ main ]
@@ -10,29 +9,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Clona tu repo
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Prepara Python
       - name: Setup Python 3.11
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
 
-      # 3. Instala el cliente de Hugging Face
       - name: Install HF CLI
         run: pip install --upgrade huggingface_hub
 
-      # 4. Autentica con tu token
-      - name: Login to Hugging Face
-        env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: huggingface-cli login --token $HF_TOKEN
+      - name: Login to Hugging Face (and configure git)
+        run: huggingface-cli login --token "${{ secrets.HF_TOKEN }}" --add-to-git-credential
 
-      # 5. Empuja al Space
       - name: Push to Hugging Face Space
         run: |
-          # Asegúrate de usar la URL HTTPS correcta de tu Space
-          git remote add space https://huggingface.co/spaces/Barearojojuan/Agent_GAIA
+          git remote remove space || true
+          git remote add space https://huggingface.co/spaces/Barearojojuan/Agent_GAIA.git
           git push space main --force
