@@ -1,58 +1,20 @@
-name: 🚀 Deploy HF Space
-
+name: Sync to Hugging Face hub
 on:
   push:
-    branches: [ main ]
+    branches: [main]
+
+  # to run this workflow manually from the Actions tab
+  workflow_dispatch:
 
 jobs:
-  deploy:
+  sync-to-hub:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # Necesario para obtener todo el historial
-
-      - name: Setup Python 3.11
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
-
-      - name: Install HF CLI (opcional)
-        run: pip install --upgrade huggingface_hub
-
-      - name: Configure Git
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          # Configura Git para usar el token directamente sin prompt
-          git config --global credential.helper store
-
-      - name: Push to HF Space
+          fetch-depth: 0
+          lfs: true
+      - name: Push to hub
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-          GIT_ASKPASS: echo
-          GIT_USERNAME: ${{ secrets.HF_TOKEN }}
-          GIT_PASSWORD: ${{ secrets.HF_TOKEN }}
-        run: |
-          # Verifica que el token existe
-          if [ -z "$HF_TOKEN" ]; then
-            echo "Error: HF_TOKEN no está configurado"
-            exit 1
-          fi
-          
-          # Elimina remote si existe (sin fallar si no existe)
-          git remote remove space 2>/dev/null || true
-          
-          # Configura las credenciales directamente
-          echo "https://$HF_TOKEN@huggingface.co" > ~/.git-credentials
-          
-          # Añade el remote con el token (formato correcto para HF)
-          git remote add space https://$HF_TOKEN@huggingface.co/spaces/Barearojojuan/Agent_GAIA.git
-          
-          # Verifica la conexión
-          git ls-remote space
-          
-          # Empuja a HF Space
-          git push space main --force
+        run: git push https://Barearojojuan:$HF_TOKEN@huggingface.co/spaces/Barearojojuan/Agent_GAIA main
