@@ -11,6 +11,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Necesario para obtener todo el historial
 
       - name: Setup Python 3.11
         uses: actions/setup-python@v4
@@ -20,13 +22,29 @@ jobs:
       - name: Install HF CLI (opcional)
         run: pip install --upgrade huggingface_hub
 
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
       - name: Push to HF Space
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          # Asegúrate de que no hay remote duplicado
-          git remote remove space || true
-          # Añade el remote con el token en la URL
+          # Verifica que el token existe
+          if [ -z "$HF_TOKEN" ]; then
+            echo "Error: HF_TOKEN no está configurado"
+            exit 1
+          fi
+          
+          # Elimina remote si existe (sin fallar si no existe)
+          git remote remove space 2>/dev/null || true
+          
+          # Añade el remote con el token (formato correcto para HF)
           git remote add space https://$HF_TOKEN@huggingface.co/spaces/Barearojojuan/Agent_GAIA.git
-          # Empuja (forzado si quieres sobreescribir)
+          
+          # Verifica la conexión
+          git ls-remote space
+          
+          # Empuja a HF Space
           git push space main --force
