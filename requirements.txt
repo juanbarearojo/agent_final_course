@@ -14,6 +14,7 @@ backoff
 SpeechRecognition
 pydub
 wikipedia-api
-beautifulsoup4
 chess
 markdownify
+beautifulsoup4
+ddgs
