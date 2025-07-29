@@ -26,10 +26,15 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          # Configura Git para usar el token directamente sin prompt
+          git config --global credential.helper store
 
       - name: Push to HF Space
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          GIT_ASKPASS: echo
+          GIT_USERNAME: ${{ secrets.HF_TOKEN }}
+          GIT_PASSWORD: ${{ secrets.HF_TOKEN }}
         run: |
           # Verifica que el token existe
           if [ -z "$HF_TOKEN" ]; then
@@ -39,6 +44,9 @@ jobs:
           
           # Elimina remote si existe (sin fallar si no existe)
           git remote remove space 2>/dev/null || true
+          
+          # Configura las credenciales directamente
+          echo "https://$HF_TOKEN@huggingface.co" > ~/.git-credentials
           
           # Añade el remote con el token (formato correcto para HF)
           git remote add space https://$HF_TOKEN@huggingface.co/spaces/Barearojojuan/Agent_GAIA.git
