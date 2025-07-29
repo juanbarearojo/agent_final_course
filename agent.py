@@ -27,8 +27,7 @@ class BasicAgent:
             ],
             additional_authorized_imports=[
                 '*', 'subprocess', 'markdownify', 'chess', 'random',
-                'time', 'itertools', 'pandas', 'webbrowser', 'requests',
-                'beautifulsoup4', 'csv', 'openpyxl', 'json', 'yaml'
+                'time', 'itertools', 'pandas', 'webbrowser', 'requests', 'csv', 'openpyxl', 'json', 'yaml'
             ],
             model=model,
             add_base_tools=True,
