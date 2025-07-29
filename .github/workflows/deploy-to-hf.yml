@@ -9,21 +9,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v4
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v4
         with:
           python-version: "3.11"
 
-      - run: pip install --upgrade huggingface_hub
+      - name: Install HF CLI (opcional)
+        run: pip install --upgrade huggingface_hub
 
-      - name: Login to Hugging Face
-        run: huggingface-cli login --token "${{ secrets.HF_TOKEN }}" --add-to-git-credential
-
-      - name: Push to Hugging Face Space
+      - name: Push to HF Space
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
+          # Asegúrate de que no hay remote duplicado
           git remote remove space || true
+          # Añade el remote con el token en la URL
           git remote add space https://$HF_TOKEN@huggingface.co/spaces/Barearojojuan/Agent_GAIA.git
+          # Empuja (forzado si quieres sobreescribir)
           git push space main --force
