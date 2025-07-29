@@ -9,22 +9,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Python 3.11
-        uses: actions/setup-python@v4
+      - uses: actions/setup-python@v4
         with:
           python-version: "3.11"
 
-      - name: Install HF CLI
-        run: pip install --upgrade huggingface_hub
+      - run: pip install --upgrade huggingface_hub
 
-      - name: Login to Hugging Face (and configure git)
+      - name: Login to Hugging Face
         run: huggingface-cli login --token "${{ secrets.HF_TOKEN }}" --add-to-git-credential
 
       - name: Push to Hugging Face Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           git remote remove space || true
-          git remote add space https://huggingface.co/spaces/Barearojojuan/Agent_GAIA.git
+          git remote add space https://$HF_TOKEN@huggingface.co/spaces/Barearojojuan/Agent_GAIA.git
           git push space main --force
